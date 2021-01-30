@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- ホスト: 127.0.0.1
--- 生成日時: 2021-01-16 03:17:12
+-- 生成日時: 2021-01-30 15:53:56
 -- サーバのバージョン： 10.4.17-MariaDB
 -- PHP のバージョン: 7.4.13
 
@@ -62,6 +62,34 @@ INSERT INTO `climbing_log` (`name`, `time`, `distance`, `maximumAltitude`) VALUE
 -- --------------------------------------------------------
 
 --
+-- テーブルの構造 `follow_table`
+--
+
+CREATE TABLE `follow_table` (
+  `follow_table_id` int(12) NOT NULL,
+  `user_id` int(12) NOT NULL,
+  `follow_user_id` int(12) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- テーブルのデータのダンプ `follow_table`
+--
+
+INSERT INTO `follow_table` (`follow_table_id`, `user_id`, `follow_user_id`) VALUES
+(6, 75, 63),
+(7, 75, 76),
+(12, 75, 68),
+(13, 75, 65),
+(14, 75, 77),
+(16, 76, 75),
+(17, 76, 63),
+(18, 76, 65),
+(22, 63, 75),
+(23, 63, 65);
+
+-- --------------------------------------------------------
+
+--
 -- テーブルの構造 `images`
 --
 
@@ -112,6 +140,36 @@ INSERT INTO `images2` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- テーブルの構造 `like_table`
+--
+
+CREATE TABLE `like_table` (
+  `id` int(12) NOT NULL,
+  `user_id` int(12) NOT NULL,
+  `todo_id` int(12) NOT NULL,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- テーブルのデータのダンプ `like_table`
+--
+
+INSERT INTO `like_table` (`id`, `user_id`, `todo_id`, `created_at`) VALUES
+(3, 68, 9, '2021-01-16 15:34:39'),
+(4, 68, 11, '2021-01-16 15:34:40'),
+(5, 68, 3, '2021-01-16 15:55:52'),
+(14, 63, 10, '2021-01-16 16:47:04'),
+(15, 63, 11, '2021-01-16 16:47:06'),
+(22, 69, 9, '2021-01-16 17:51:38'),
+(24, 69, 11, '2021-01-16 17:51:39'),
+(25, 0, 10, '2021-01-30 16:57:20'),
+(26, 0, 9, '2021-01-30 16:57:23'),
+(30, 63, 3, '2021-01-30 17:08:54'),
+(32, 63, 9, '2021-01-30 17:08:56');
+
+-- --------------------------------------------------------
+
+--
 -- テーブルの構造 `map_tweet`
 --
 
@@ -150,6 +208,7 @@ CREATE TABLE `todo_table` (
   `id` int(12) NOT NULL,
   `todo` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `deadline` date NOT NULL,
+  `image` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -158,11 +217,13 @@ CREATE TABLE `todo_table` (
 -- テーブルのデータのダンプ `todo_table`
 --
 
-INSERT INTO `todo_table` (`id`, `todo`, `deadline`, `created_at`, `updated_at`) VALUES
-(3, 'HTML', '2020-12-21', '2020-12-19 15:59:23', '2020-12-19 15:59:23'),
-(9, 'HTML', '2020-12-21', '2020-12-19 15:59:23', '2020-12-19 15:59:23'),
-(10, 'HTML', '2020-12-21', '2020-12-19 15:59:23', '2020-12-19 15:59:23'),
-(11, '1', '2021-01-05', '2021-01-05 16:51:55', '2021-01-05 16:51:55');
+INSERT INTO `todo_table` (`id`, `todo`, `deadline`, `image`, `created_at`, `updated_at`) VALUES
+(3, 'HTML', '2020-12-21', NULL, '2020-12-19 15:59:23', '2020-12-19 15:59:23'),
+(9, 'HTML', '2020-12-21', NULL, '2020-12-19 15:59:23', '2020-12-19 15:59:23'),
+(10, 'HTML', '2020-12-21', NULL, '2020-12-19 15:59:23', '2020-12-19 15:59:23'),
+(11, '1', '2021-01-05', NULL, '2021-01-05 16:51:55', '2021-01-05 16:51:55'),
+(12, 'd', '2021-01-05', 'upload/202101300835536a28ce70d7d13b7cb32be69f40ba3a30.JPG', '2021-01-30 16:35:53', '2021-01-30 16:35:53'),
+(13, 'd', '2021-01-05', 'upload/20210130083637c7d3861bf1347afdc50e3fcea00d5c83.png', '2021-01-30 16:36:37', '2021-01-30 16:36:37');
 
 -- --------------------------------------------------------
 
@@ -172,6 +233,7 @@ INSERT INTO `todo_table` (`id`, `todo`, `deadline`, `created_at`, `updated_at`) 
 
 CREATE TABLE `tozan_record_table` (
   `image_id` int(11) NOT NULL,
+  `user_id` int(12) NOT NULL,
   `image_name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -185,13 +247,20 @@ CREATE TABLE `tozan_record_table` (
 -- テーブルのデータのダンプ `tozan_record_table`
 --
 
-INSERT INTO `tozan_record_table` (`image_id`, `image_name`, `created_at`, `name`, `date`, `time`, `distance`, `maximumAltitude`) VALUES
-(13, '657285776600195cd93f0e2.92953996.JPG', '2021-01-15 22:17:01', '由布岳', '2019-02-17', '06:05:00', 7700, 1583),
-(14, '161189140460019624868bb2.60779938.JPG', '2021-01-15 22:18:28', '九重山', '2018-04-26', '02:45:00', 8900, 1700),
-(15, '20562579656001967a81ded6.80065978.JPG', '2021-01-15 22:19:54', '英彦山', '2019-01-01', '03:00:00', 2000, 1050),
-(16, '14756020696001a4c3a02468.24186210.JPG', '2021-01-15 23:20:51', '立石山', '2021-01-01', '01:30:00', 2000, 1050),
-(17, '18970811566001a6c8f11ea7.26422452.JPG', '2021-01-15 23:29:28', '三俣', '2021-01-26', '07:00:00', 2000, 1000),
-(18, '60250428860024b678a98d4.61465150.JPG', '2021-01-16 11:11:51', '九重山', '2021-01-01', '01:05:00', 2000, 1050);
+INSERT INTO `tozan_record_table` (`image_id`, `user_id`, `image_name`, `created_at`, `name`, `date`, `time`, `distance`, `maximumAltitude`) VALUES
+(13, 0, '657285776600195cd93f0e2.92953996.JPG', '2021-01-15 22:17:01', '由布岳', '2019-02-17', '06:05:00', 7700, 1583),
+(14, 0, '161189140460019624868bb2.60779938.JPG', '2021-01-15 22:18:28', '九重山', '2018-04-26', '02:45:00', 8900, 1700),
+(15, 0, '20562579656001967a81ded6.80065978.JPG', '2021-01-15 22:19:54', '英彦山', '2019-01-01', '03:00:00', 2000, 1050),
+(16, 0, '14756020696001a4c3a02468.24186210.JPG', '2021-01-15 23:20:51', '立石山', '2021-01-01', '01:30:00', 2000, 1050),
+(17, 0, '18970811566001a6c8f11ea7.26422452.JPG', '2021-01-15 23:29:28', '三俣', '2021-01-26', '07:00:00', 2000, 1000),
+(18, 0, '60250428860024b678a98d4.61465150.JPG', '2021-01-16 11:11:51', '九重山', '2021-01-01', '01:05:00', 2000, 1050),
+(20, 63, '1341508249600d8f02ecf9d3.77999444.JPG', '2021-01-25 00:15:14', '立石山', '2021-01-25', '01:00:00', 800, 1050),
+(22, 65, '73961621860119ff1e39c24.48564872.png', '2021-01-28 02:16:33', '三俣山', '2021-01-30', '01:20:00', 2000, 1700),
+(23, 63, '1479880814600f72c62b5e78.67961071.JPG', '2021-01-26 10:39:18', '由布岳', '2021-01-26', '05:00:00', 2000, 1583),
+(24, 63, '84669253360117b456eb1d3.04628459.JPG', '2021-01-27 23:40:05', 'test3', '2021-01-26', '01:00:00', 2000, 1050),
+(25, 63, '614370736600fc5b80d4603.38929582.JPG', '2021-01-26 16:33:12', '三俣山', '2021-01-14', '01:00:00', 7700, 1700),
+(28, 63, '1941317987601169f8ba9ff8.75611119.JPG', '2021-01-27 22:26:16', '英彦山', '2021-01-27', '05:00:00', 2000, 1700),
+(29, 68, '175833173260118e4227c936.82345686.JPG', '2021-01-28 01:01:06', 'test', '2021-01-02', '03:00:00', 2000, 1700);
 
 -- --------------------------------------------------------
 
@@ -205,28 +274,44 @@ CREATE TABLE `users_table` (
   `password` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_admin` int(1) NOT NULL,
   `is_deleted` int(1) NOT NULL,
-  `created_at` int(11) NOT NULL,
-  `updated_at` datetime NOT NULL
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `user_image` varchar(256) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- テーブルのデータのダンプ `users_table`
 --
 
-INSERT INTO `users_table` (`id`, `username`, `password`, `is_admin`, `is_deleted`, `created_at`, `updated_at`) VALUES
-(62, 'name', 'pass', 0, 0, 2147483647, '2021-01-09 15:54:26'),
-(63, 'name', '1234', 0, 0, 2147483647, '2021-01-09 17:14:52'),
-(65, 'yuki1569', '1234', 0, 0, 2147483647, '2021-01-14 21:37:00');
+INSERT INTO `users_table` (`id`, `username`, `password`, `is_admin`, `is_deleted`, `created_at`, `updated_at`, `user_image`) VALUES
+(63, 'name', '1234', 0, 0, '0000-00-00 00:00:00', '2021-01-29 01:47:15', ''),
+(65, 'yuki1569', '1234', 0, 0, '0000-00-00 00:00:00', '2021-01-14 21:37:00', ''),
+(68, 'name1', '1234', 0, 0, '2021-01-16 15:34:23', '2021-01-16 15:34:23', ''),
+(75, 'name2', '1234', 0, 0, '2021-01-28 01:00:23', '2021-01-28 01:00:23', ''),
+(76, 'name3', '1234', 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', ''),
+(77, 'user4', '1234', 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '');
 
 --
 -- ダンプしたテーブルのインデックス
 --
 
 --
+-- テーブルのインデックス `follow_table`
+--
+ALTER TABLE `follow_table`
+  ADD PRIMARY KEY (`follow_table_id`);
+
+--
 -- テーブルのインデックス `images`
 --
 ALTER TABLE `images`
   ADD PRIMARY KEY (`image_id`);
+
+--
+-- テーブルのインデックス `like_table`
+--
+ALTER TABLE `like_table`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- テーブルのインデックス `map_tweet`
@@ -257,10 +342,22 @@ ALTER TABLE `users_table`
 --
 
 --
+-- テーブルの AUTO_INCREMENT `follow_table`
+--
+ALTER TABLE `follow_table`
+  MODIFY `follow_table_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
 -- テーブルの AUTO_INCREMENT `images`
 --
 ALTER TABLE `images`
   MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- テーブルの AUTO_INCREMENT `like_table`
+--
+ALTER TABLE `like_table`
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- テーブルの AUTO_INCREMENT `map_tweet`
@@ -272,19 +369,19 @@ ALTER TABLE `map_tweet`
 -- テーブルの AUTO_INCREMENT `todo_table`
 --
 ALTER TABLE `todo_table`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- テーブルの AUTO_INCREMENT `tozan_record_table`
 --
 ALTER TABLE `tozan_record_table`
-  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- テーブルの AUTO_INCREMENT `users_table`
 --
 ALTER TABLE `users_table`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

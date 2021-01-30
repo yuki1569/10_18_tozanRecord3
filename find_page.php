@@ -10,40 +10,59 @@ $user_id = $_SESSION["user_id"];
 //   INNER JOIN users_table ON
 //   tozan_record_table.user_id = users_table.id
 //   ORDER BY users_table.created_at DESC';
-$sql = 'SELECT * FROM users_table
-  WHERE users_table.id != :user_id
-   ORDER BY users_table.created_at DESC ';
 
+// フォロー済みアカウントの抽出
+$sql = 'SELECT * FROM follow_table
+INNER JOIN users_table ON
+follow_table.follow_user_id = users_table.id
+WHERE follow_table.user_id = :user_id
+ORDER BY users_table.created_at DESC';
 $stmt = $pdo->prepare($sql);
 $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $records = $stmt->fetchAll();
 
-$sql = ''
+// 未フォローアカウントの抽出
+// 自分のアカウントid以外
+$sql = 'SELECT * FROM users_table
+WHERE id != :user_id
+ORDER BY users_table.created_at DESC
+';
+$stmt = $pdo->prepare($sql);
+$stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$users_data = $stmt->fetchAll();
 
-// print_r( $records[0]['username']);
+// 自分がフォローしているアカウント
+$sql = 'SELECT * FROM follow_table WHERE user_id = :user_id
+';
+$stmt = $pdo->prepare($sql);
+$stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$follow_data = $stmt->fetchAll();
 
 
+$users_column = [];
+foreach ($users_data as $user) {
+  array_push($users_column, $user['id']);
+}
+$follow_column = [];
+foreach ($follow_data as $follow) {
+  array_push($follow_column, $follow['follow_user_id']);
+}
+// print_r($users_column);
+// print_r($follow_column);
+// print_r($follow_column[0]);
+
+//自分がフォローしていないアカウントのidを抽出
+foreach ($follow_column as $follow) {
+  while (($index = array_search($follow, $users_column, true)) !== false) {
+    unset($users_column[$index]);
+  }
+}
+print_r($users_column);
 
 
-// if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-//   // 画像を取得
-//   $sql = 'SELECT * FROM tozan_record_table WHERE user_id=:user_id ORDER BY created_at DESC';
-//   $stmt = $pdo->prepare($sql);
-//   $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-//   $stmt->execute();
-//   $records = $stmt->fetchAll();
-
-//   $sql = 'SELECT * FROM users_table
-// WHERE id=:user_id ';
-//   $stmt = $pdo->prepare($sql);
-//   $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-//   $stmt->execute();
-//   $status = $stmt->fetch();
-// } else {
-//   exit();
-// }
-// unset($pdo);
 
 ?>
 
@@ -167,61 +186,7 @@ $sql = ''
 
 <body>
 
-  <!-- モーダル表示 -->
-  <div id="mask" class="hidden"></div>
-  <section id="modal" class="hidden">
 
-  </section>
-
-  <!-- パネルを閉じる用 -->
-  <main></main>
-  <!-- パネルメニュー -->
-  <div class="panel-menu-container">
-    <div class="panel-menu">
-      <div class="panel-menu-list">
-
-
-        <form action="execution.php/create.php" method="post" enctype="multipart/form-data">
-          <h3>登山記録</h3>
-
-          <table class="table">
-            <input type="hidden" name=" user_id" value="<?= $user_id ?>">
-            <tr>
-              <td>山名:</td>
-              <td><input type="text" name="name"></td>
-            </tr>
-            <tr>
-              <td>日付:</td>
-              <td><input type="date" name="date"></td>
-            </tr>
-            <tr>
-              <td>時間:</td>
-              <td><input type="time" value="00:00:00" step="300" name="time"></td>
-            </tr>
-            <tr>
-              <td>距離:</td>
-              <td><input type="text" name="distance"></td>
-            </tr>
-            <tr>
-              <td>最大標高:</td>
-              <td><input type="text" name="maximumAltitude"></td>
-            </tr>
-            <tr>
-              <td>画像を選択</td>
-              <td><input type="file" name="image" required></td>
-            </tr>
-            </tbody>
-
-          </table>
-          <button type="submit" class="btn btn-primary">保存</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- <a id="panel-btn" style="display:block;">+ -->
-  <!-- <span id="panel-btn-icon"></span> -->
-  <!-- </a><br> -->
   <div id="navbar">
     <ul>
       <li><a href="input.php">TOP</a></li>
@@ -233,7 +198,8 @@ $sql = ''
     </ul>
   </div>
 
-  <!-- フォローしているユーザーの画像一覧 -->
+  <!-- フォローしているユーザー一覧 -->
+  <p>フォロー済み</p>
   <div class="container mt-5">
     <?php for ($i = 0; $i < count($records); $i++) : ?>
       <div class="">
@@ -251,6 +217,8 @@ $sql = ''
 
         <p style="display:inline"><?php echo $records[$i]['username'] ?>さん</p>
 
+        <a href="execution.php/unfollow_act.php?id=<?= $records[$i]["id"]; ?>">フォローを外す</a>
+
         <div class="media-body">
           <!-- <h5><?= $records[$i]['name']; ?> (<?= $records[$i]['maximumAltitude']; ?>m)</h5>
           <h5>日時 <?= $records[$i]['date']; ?></h5>
@@ -259,6 +227,44 @@ $sql = ''
         </div>
       </div>
     <?php endfor; ?>
+
+  </div>
+
+  <p>未フォロー</p>
+  <div class="container mt-5">
+    <?php for ($i = 0; $i < count($users_data); $i++) : ?>
+      <div class="">
+        <?php foreach ($users_column as $nofollow_user) : ?>
+          <?php if ($users_data[$i]['id'] == $nofollow_user) : ?>
+            <?php if ($users_data[$i]['user_image'] == '') : ?>
+              <a class="modal-btn">
+                <img src="images\383412829600d8f5e9985a0.99691526.JPG" width="20%" height="auto" class="mr-3">
+              </a>
+            <?php else : ?>
+              <a class="modal-btn">
+                <img src="images/<?php echo $users_data[$i]['image_name']; ?>" data-id="<?= $users_data[$i]['image_id'] ?>" width="100%" height="auto" class="mr-3">
+              </a>
+            <?php endif; ?>
+
+            <p style="display:inline"><?php echo $users_data[$i]['username'] ?>さん</p>
+
+            <!-- <form action="execution.php/follow_act.php" method="POST"><input type="text"></form> -->
+
+
+            <a href="execution.php/follow_act.php?id=<?= $users_data[$i]["id"]; ?>">フォロー</a>
+
+            <?PHP echo $users_data[$i]["id"]; ?>
+
+            <div class="media-body">
+              <!-- <h5><?= $users_data[$i]['name']; ?> (<?= $users_data[$i]['maximumAltitude']; ?>m)</h5>
+          <h5>日時 <?= $users_data[$i]['date']; ?></h5>
+          <h5>活動時間 <?= $users_data[$i]['time']; ?></h5>
+          <h5>歩いた距離 <?= $users_data[$i]['distance'] / 1000; ?>km</h5> -->
+            </div>
+      </div>
+    <?php endif; ?>
+  <?php endforeach ?>
+<?php endfor; ?>
 
   </div>
 
