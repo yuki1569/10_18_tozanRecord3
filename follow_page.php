@@ -163,7 +163,7 @@ $records = $stmt->fetchAll();
 </head>
 
 
-<body>
+<body style="width: 70%; margin: 0 auto;">
 
   <!-- モーダル表示 -->
   <div id="mask" class="hidden"></div>
@@ -224,10 +224,9 @@ $records = $stmt->fetchAll();
     <ul>
       <li><a href="input.php">TOP</a></li>
       <li><a href="follow_page.php">フォロー</a></li>
-      <li><a href="follow_page.php">探す</a></li>
+      <li><a href="find_page.php">探す</a></li>
       <li><a href="data.php">Record</a></li>
       <li><a href="profile_edit.php">プロフィール</a></li>
-      <li><a id="panel-btn" style="display:block;">＋</a></li>
     </ul>
   </div>
 
